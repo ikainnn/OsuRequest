@@ -13,7 +13,7 @@ namespace kaede::api
 
     auto download_beatmap(const std::filesystem::path path, const Beatmap& beatmap) -> void
     {
-        const auto filename = fmt::format("{}/{} {} - {}", path.string(), beatmap.beatmapsetID, beatmap.songInfo.artist, beatmap.songInfo.title);
+        const auto filename = fmt::format("{}/{} {} - {}.osz", path.string(), beatmap.beatmapsetID, beatmap.songInfo.artist, beatmap.songInfo.title);
 
         std::ofstream beatmapStream { filename, std::ios::binary };
 
