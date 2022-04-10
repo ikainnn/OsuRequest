@@ -27,7 +27,7 @@ namespace kaede::api
             .version = beatmapJson["version"],
             .mode = beatmapJson["mode"],
             .creator = beatmapJson["creator"],
-            .difficultyRating = beatmapJson["difficultyRating"],
+            .difficultyRating = beatmapJson["difficultyrating"],
 
             .songInfo = Beatmap::Song
             {
