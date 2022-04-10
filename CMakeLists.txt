@@ -22,7 +22,7 @@ endif()
 add_subdirectory("External/spdlog")
 add_subdirectory("External/fmt")
 
-set(SOURCE_FILES "${BASE}/Net/Client.cpp" "${BASE}/Api/Osu.cpp")
+set(SOURCE_FILES "${BASE}/Net/Client.cpp" "${BASE}/Api/Osu.cpp" "${BASE}/Api/Beatconnect.cpp")
 
 add_library(${PROJECT_NAME} STATIC ${SOURCE_FILES})
 

@@ -16,7 +16,7 @@ namespace kaede::api
     {
         std::string response { };
 
-        core::get<std::string>(fmt::format(endpoint::GET_BEATMAP_INFO, playerKey, beatmapHash), &response);
+        core::get(fmt::format(endpoint::GET_BEATMAP_INFO, playerKey, beatmapHash), &response);
         
         const auto beatmapJson = nlohmann::json::parse(response)[0];
 
