@@ -19,9 +19,16 @@ namespace kaede::api
             KAEDE_ERRO(fmt::format("Couldn't find path {}", path.string())); return;
         }
 
-        const auto filename = fmt::format("{}/{} {} - {}.osz", path.string(), beatmap.beatmapsetID, beatmap.songInfo.artist, beatmap.songInfo.title);
+        auto beatmapName = fmt::format("{} {} - {}", beatmap.beatmapsetID, beatmap.songInfo.artist, beatmap.songInfo.title);
 
-        std::ofstream beatmapStream { filename, std::ios::binary };
+        std::replace_if(beatmapName.begin(), beatmapName.end(), [](auto value)
+        {
+            return value == '\\' || value == '\"' || value == '/' ||
+                   value == '*'  || value == '?'  || value == '|' ||
+                   value == '<'  || value == '>'  || value == ':';
+        }, '_');
+
+        std::ofstream beatmapStream { fmt::format("{}/{}.osz", path.string(), beatmapName), std::ios::binary };
 
         core::get(fmt::format(endpoint::DOWNLOAD_BEATMAP, beatmap.beatmapsetID), &beatmapStream);
     }
