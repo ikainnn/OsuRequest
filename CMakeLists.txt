@@ -19,8 +19,16 @@ else()
     set(CURLCPP_LIB_DIR "${CURLCPP_LIB_DIR}/curlcpp.lib")
 endif()
 
-add_subdirectory("External/spdlog")
-add_subdirectory("External/fmt")
+macro(add_subdirectory_safe var)
+    if (NOT TARGET ${var})
+        add_subdirectory("External/${var}")
+    else()
+        message(STATUS "${var} is already added. nothing changed.")
+    endif()
+endmacro()
+
+add_subdirectory_safe("spdlog")
+add_subdirectory_safe("fmt")
 
 set(SOURCE_FILES "${BASE}/Net/Client.cpp" "${BASE}/Api/Osu.cpp" "${BASE}/Api/Beatconnect.cpp")
 
