@@ -22,7 +22,7 @@ endif()
 add_subdirectory("External/spdlog")
 add_subdirectory("External/fmt")
 
-set(SOURCE_FILES "${BASE}/Net/Client.cpp")
+set(SOURCE_FILES "${BASE}/Net/Client.cpp" "${BASE}/Api/Osu.cpp")
 
 add_library(${PROJECT_NAME} STATIC ${SOURCE_FILES})
 
@@ -30,7 +30,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     "External/curl/include"
     "External/curlcpp/include"
     "External/spdlog/include"
-    "External/json"
+    "External/json/include"
     "External/fmt/include")
 
 target_link_libraries(${PROJECT_NAME} ${CURL_LIB_DIR} ${CURLCPP_LIB_DIR} ws2_32 crypt32 wldap32 normaliz spdlog fmt)

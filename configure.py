@@ -14,9 +14,6 @@ def parse_command_arguments(arguments):
     return extraArguments
 
 def main(arguments):
-    system("git submodule update --init --recursive")
-    system("git submodule update --remote")
-
     arguments.pop(0) # ignores the first argument (aka executable name)
     extraArguments = parse_command_arguments(arguments)
     configurationCommand = format("cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=true {} -G \"Ninja\" -S . -B Build/", extraArguments)
