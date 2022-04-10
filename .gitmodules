@@ -1,0 +1,9 @@
+[submodule "External/spdlog"]
+	path = External/spdlog
+	url = https://github.com/gabime/spdlog
+[submodule "External/json"]
+	path = External/json
+	url = https://github.com/nlohmann/json
+[submodule "External/fmt"]
+	path = External/fmt
+	url = https://github.com/fmtlib/fmt/
