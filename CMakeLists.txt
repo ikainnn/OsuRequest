@@ -19,6 +19,9 @@ else()
     set(CURLCPP_LIB_DIR "${CURLCPP_LIB_DIR}/curlcpp.lib")
 endif()
 
+add_subdirectory("External/spdlog")
+add_subdirectory("External/fmt")
+
 set(SOURCE_FILES "${BASE}/Net/Client.cpp")
 
 add_library(${PROJECT_NAME} STATIC ${SOURCE_FILES})
