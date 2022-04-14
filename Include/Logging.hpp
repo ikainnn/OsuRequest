@@ -1,5 +1,5 @@
-#ifndef LOGGING_HPP
-#define LOGGING_HPP
+#ifndef LOGGING
+#define LOGGING
 
 #include "spdlog/spdlog.h"
 
