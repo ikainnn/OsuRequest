@@ -17,6 +17,7 @@ namespace kaede::api::core
     using WriteFunction = std::size_t (*)(char*, std::size_t, std::size_t, UnknownType*);
 
     template <class UnknownType>
+    // cppcheck-suppress passedByValue
     auto get(const std::string_view url, UnknownType* result, const WriteFunction<UnknownType> writeFunction) -> void
     {
         curl::curl_easy curl { };
@@ -39,13 +40,13 @@ namespace kaede::api::core
     }
 
     template <class UnknownType>
-    auto get(const std::string_view url, UnknownType* result) -> void;
+    auto get(const std::string_view url, UnknownType* result) -> void; // cppcheck-suppress passedByValue
 
     template <>
-    auto get(const std::string_view url, std::string* result) -> void;
+    auto get(const std::string_view url, std::string* result) -> void; // cppcheck-suppress passedByValue
     
     template <>
-    auto get(const std::string_view url, std::ofstream* result) -> void;
+    auto get(const std::string_view url, std::ofstream* result) -> void; // cppcheck-suppress passedByValue
 }
 
 #endif

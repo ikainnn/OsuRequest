@@ -1,5 +1,10 @@
 #include "../Include/KaedeRequest/Beatmap.hpp"
 
+#include <future>
+#include <ranges>
+#include <thread>
+#include <vector>
+
 #include "fmt/format.h"
 #include "nlohmann/json.hpp"
 
@@ -14,6 +19,7 @@ namespace kaede::api
         constexpr const auto GET_BEATMAP_INFO = "https://osu.ppy.sh/api/get_beatmaps?k={}&h={}";
     }
 
+    // cppcheck-suppress passedByValue
     auto get_beatmap_info(const std::string_view playerKey, const std::string_view beatmapHash) -> Beatmap
     {
         std::string response { };
@@ -39,6 +45,54 @@ namespace kaede::api
                 .bpm = beatmapJson["bpm"]
             }
         };
+    }
+
+    // cppcheck-suppress passedByValue
+    auto get_beatmap_info(const std::string_view playerKey, const std::vector<std::string_view> beatmapHashes) -> std::vector<Beatmap>
+    {
+        std::vector<Beatmap> beatmaps { }; beatmaps.reserve(beatmapHashes.size());
+
+        std::ranges::transform(beatmapHashes, std::back_inserter(beatmaps), [playerKey] (auto hash) -> Beatmap
+        {
+            return get_beatmap_info(playerKey, hash);
+        });
+
+        return beatmaps;
+    }
+
+    // cppcheck-suppress passedByValue
+    auto get_beatmap_info(const std::string_view playerKey,
+                          const std::vector<std::string_view>& beatmapHashes,
+                          const std::size_t threadCount) -> std::vector<Beatmap>
+    {
+        std::vector<Beatmap> beatmaps { }; beatmaps.reserve(beatmapHashes.size());
+
+        const auto processAfter = (beatmapHashes.size() % threadCount);
+        const auto processNow   = beatmapHashes.size() - processAfter;
+
+        using ptrGBI = Beatmap(*)(const std::string_view, const std::string_view);
+
+        if (processNow)
+        {
+            std::vector<std::future<Beatmap>> workers { 4 };
+
+            for (std::size_t pos = 0; pos < processNow; pos += threadCount)
+            {
+                for (auto thread = 0; thread < threadCount; ++thread)
+                {
+                    workers[pos + thread] = std::async<ptrGBI>(std::launch::async, get_beatmap_info, playerKey, beatmapHashes[pos + thread]);
+                }
+
+                std::ranges::transform(workers, std::back_inserter(beatmaps), [](auto& worker){ return worker.get(); });
+            }
+        }
+
+        if (processAfter)
+        {
+            get_beatmap_info(playerKey, { beatmapHashes.begin() + processNow, beatmapHashes.end() });
+        }
+
+        return beatmaps;
     }
 
     auto download_beatmap(const std::filesystem::path path, const Beatmap& beatmap) -> void
