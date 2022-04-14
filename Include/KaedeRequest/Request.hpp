@@ -2,8 +2,7 @@
 #define REQUEST
 
 #include "Core/Client.hpp"
-#include "Api/Beatconnect.hpp"
-#include "Api/Osu.hpp" 
+#include "Api/Beatmap.hpp"
 #include "Beatmap.hpp"
 
 #endif
