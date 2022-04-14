@@ -28,17 +28,15 @@ namespace kaede::api
         Song songInfo;
     };
 
-    // cppcheck-suppress passedByValue
-    auto get_beatmap_info(const std::string_view playerKey, const std::string_view beatmapHash) -> Beatmap;
+    auto get_beatmap_info(const std::string_view& playerKey, const std::string_view& beatmapHash) -> Beatmap;
     
-    // cppcheck-suppress passedByValue
-    auto get_beatmap_info(const std::string_view playerKey, const std::vector<std::string_view> beatmapHashes) -> std::vector<Beatmap>;
+    auto get_beatmap_info(const std::string_view& playerKey, const std::vector<std::string_view>& beatmapHashes) -> std::vector<Beatmap>;
 
-    auto get_beatmap_info(const std::string_view playerKey, // cppcheck-suppress passedByValue
+    auto get_beatmap_info(const std::string_view& playerKey,
                           const std::vector<std::string_view>& beatmapHashes, 
                           const std::size_t threadCount) -> std::vector<Beatmap>;
 
-    auto download_beatmap(const std::filesystem::path path, const Beatmap& beatmap) -> void;
+    auto download_beatmap(const std::filesystem::path& path, const Beatmap& beatmap) -> void;
 }
 
 #endif

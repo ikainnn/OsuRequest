@@ -19,8 +19,7 @@ namespace kaede::api
         constexpr const auto GET_BEATMAP_INFO = "https://osu.ppy.sh/api/get_beatmaps?k={}&h={}";
     }
 
-    // cppcheck-suppress passedByValue
-    auto get_beatmap_info(const std::string_view playerKey, const std::string_view beatmapHash) -> Beatmap
+    auto get_beatmap_info(const std::string_view& playerKey, const std::string_view& beatmapHash) -> Beatmap
     {
         std::string response { };
 
@@ -47,8 +46,7 @@ namespace kaede::api
         };
     }
 
-    // cppcheck-suppress passedByValue
-    auto get_beatmap_info(const std::string_view playerKey, const std::vector<std::string_view> beatmapHashes) -> std::vector<Beatmap>
+    auto get_beatmap_info(const std::string_view& playerKey, const std::vector<std::string_view>& beatmapHashes) -> std::vector<Beatmap>
     {
         std::vector<Beatmap> beatmaps { }; beatmaps.reserve(beatmapHashes.size());
 
@@ -60,8 +58,7 @@ namespace kaede::api
         return beatmaps;
     }
 
-    // cppcheck-suppress passedByValue
-    auto get_beatmap_info(const std::string_view playerKey,
+    auto get_beatmap_info(const std::string_view& playerKey,
                           const std::vector<std::string_view>& beatmapHashes,
                           const std::size_t threadCount) -> std::vector<Beatmap>
     {
@@ -70,7 +67,7 @@ namespace kaede::api
         const auto processAfter = (beatmapHashes.size() % threadCount);
         const auto processNow   = beatmapHashes.size() - processAfter;
 
-        using ptrGBI = Beatmap(*)(const std::string_view, const std::string_view);
+        using ptrGBI = Beatmap(*)(const std::string_view&, const std::string_view&);
 
         if (processNow)
         {
