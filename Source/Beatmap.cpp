@@ -69,11 +69,11 @@ namespace kaede::api
 
         using ptrGBI = Beatmap(*)(const std::string_view&, const std::string_view&);
 
-        if (processNow)
+        const auto processHashes = [&playerKey, &beatmaps](const std::vector<std::string>& beatmapHashes, const std::size_t processCount, const std::size_t threadCount)
         {
-            std::vector<std::future<Beatmap>> workers { 4 };
+            std::vector<std::future<Beatmap>> workers { threadCount };
 
-            for (std::size_t pos = 0; pos < processNow; pos += threadCount)
+            for (std::size_t pos = 0; pos < processCount; pos += threadCount)
             {
                 for (auto thread = 0; thread < threadCount; ++thread)
                 {
@@ -82,12 +82,10 @@ namespace kaede::api
 
                 std::ranges::transform(workers, std::back_inserter(beatmaps), [](auto& worker){ return worker.get(); });
             }
-        }
+        };
 
-        if (processAfter)
-        {
-            get_beatmap_info(playerKey, { beatmapHashes.begin() + processNow, beatmapHashes.end() });
-        }
+        processHashes(beatmapHashes, processNow, threadCount);
+        processHashes({ beatmapHashes.begin() + processNow, beatmapHashes.end() }, processAfter, processAfter);
 
         return beatmaps;
     }
