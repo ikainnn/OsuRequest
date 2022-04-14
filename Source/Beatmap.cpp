@@ -59,7 +59,7 @@ namespace kaede::api
     }
 
     auto get_beatmap_info(const std::string_view& playerKey,
-                          const std::vector<std::string_view>& beatmapHashes,
+                          const std::vector<std::string>& beatmapHashes,
                           const std::size_t threadCount) -> std::vector<Beatmap>
     {
         std::vector<Beatmap> beatmaps { }; beatmaps.reserve(beatmapHashes.size());
