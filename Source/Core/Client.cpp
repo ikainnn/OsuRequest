@@ -1,4 +1,4 @@
-#include "../../Include/KaedeRequest/Net/Client.hpp"
+#include "../../Include/KaedeRequest/Core/Client.hpp"
 
 namespace kaede::api::core
 {

@@ -30,7 +30,7 @@ endmacro()
 add_subdirectory_safe("spdlog")
 add_subdirectory_safe("fmt")
 
-set(SOURCE_FILES "${BASE}/Net/Client.cpp" "${BASE}/Api/Osu.cpp" "${BASE}/Api/Beatconnect.cpp")
+set(SOURCE_FILES "${BASE}/Core/Client.cpp" "${BASE}/Beatmap.cpp")
 
 add_library(${PROJECT_NAME} STATIC ${SOURCE_FILES})
 

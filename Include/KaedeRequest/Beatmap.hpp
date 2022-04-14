@@ -2,6 +2,7 @@
 #define BEATMAP
 
 #include <string>
+#include <filesystem>
 
 namespace kaede::api
 {
@@ -24,6 +25,9 @@ namespace kaede::api
 
         Song songInfo;
     };
+
+    auto get_beatmap_info(const std::string_view playerKey, const std::string_view beatmapHash) -> Beatmap;
+    auto download_beatmap(const std::filesystem::path path, const Beatmap& beatmap) -> void;
 }
 
 #endif
