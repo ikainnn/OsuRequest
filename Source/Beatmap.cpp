@@ -21,6 +21,8 @@ namespace kaede::api
 
     auto get_beatmap_info(const std::string_view& playerKey, const std::string_view& beatmapHash) -> Beatmap
     {
+        if (playerKey.empty()) return { };
+
         std::string response { };
 
         core::get(fmt::format(endpoint::GET_BEATMAP_INFO, playerKey, beatmapHash), &response);
@@ -55,6 +57,8 @@ namespace kaede::api
             return get_beatmap_info(playerKey, hash);
         });
 
+        if (playerKey.empty()) KAEDE_WARN("playerKey was empty. request might not have been completed properly.");
+
         return beatmaps;
     }
 
@@ -86,6 +90,8 @@ namespace kaede::api
 
         processHashes(beatmapHashes, processNow, threadCount);
         processHashes({ beatmapHashes.begin() + processNow, beatmapHashes.end() }, processAfter, processAfter);
+
+        if (playerKey.empty()) KAEDE_WARN("playerKey was empty. request might not have been completed properly.");
 
         return beatmaps;
     }
