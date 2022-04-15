@@ -29,7 +29,7 @@ namespace kaede::api
         
         const auto beatmapJson = nlohmann::json::parse(response)[0];
 
-        if (beatmapJson.empty()) { KAEDE_WARN(fmt::format("couldn't retrieve information for {}.", beatmapHash)); return { }; }
+        if (beatmapJson.is_null()) { KAEDE_WARN(fmt::format("couldn't retrieve information for {}.", beatmapHash)); return { }; }
 
         return Beatmap
         {
