@@ -3,7 +3,6 @@
 #include <future>
 #include <ranges>
 #include <thread>
-#include <vector>
 
 #include "fmt/format.h"
 #include "nlohmann/json.hpp"
