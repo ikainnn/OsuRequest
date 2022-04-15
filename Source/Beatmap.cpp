@@ -21,6 +21,8 @@ namespace kaede::api
 
     auto get_beatmap_info(const std::string_view& playerKey, const std::string_view& beatmapHash) -> Beatmap
     {
+        if (playerKey.empty()) { KAEDE_ERRO("playerKey was empty."); return { }; }
+
         std::string response { };
 
         core::get(fmt::format(endpoint::GET_BEATMAP_INFO, playerKey, beatmapHash), &response);
