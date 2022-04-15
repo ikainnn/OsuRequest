@@ -51,7 +51,7 @@ namespace kaede::api
         };
     }
 
-    auto get_beatmap_info(const PlayerKey& playerKey, const std::vector<Hash>& beatmapHashes) -> std::vector<Beatmap>
+    auto get_beatmap_info(const PlayerKey& playerKey, const Hashes& beatmapHashes) -> std::vector<Beatmap>
     {
         std::vector<Beatmap> beatmaps { }; beatmaps.reserve(beatmapHashes.size());
 
@@ -65,7 +65,7 @@ namespace kaede::api
         return beatmaps;
     }
 
-    auto get_beatmap_info(const PlayerKey& playerKey, const std::vector<Hash>& beatmapHashes, const std::size_t threadCount) -> std::vector<Beatmap>
+    auto get_beatmap_info(const PlayerKey& playerKey, const Hashes& beatmapHashes, const std::size_t threadCount) -> std::vector<Beatmap>
     {
         std::vector<Beatmap> beatmaps { }; beatmaps.reserve(beatmapHashes.size());
 
@@ -74,7 +74,7 @@ namespace kaede::api
 
         using GBI = Beatmap(*)(const std::string_view&, const std::string_view&);
 
-        const auto processHashes = [&playerKey, &beatmaps](const std::vector<Hash>& beatmapHashes, const std::size_t processCount, const std::size_t threadCount)
+        const auto processHashes = [&playerKey, &beatmaps](const Hashes& beatmapHashes, const std::size_t processCount, const std::size_t threadCount)
         {
             std::vector<std::future<Beatmap>> workers { threadCount };
 
