@@ -77,7 +77,7 @@ namespace kaede::api
             {
                 for (auto thread = 0; thread < threadCount; ++thread)
                 {
-                    workers[pos + thread] = std::async<ptrGBI>(std::launch::async, get_beatmap_info, playerKey, beatmapHashes[pos + thread]);
+                    workers[thread] = std::async<ptrGBI>(std::launch::async, get_beatmap_info, playerKey, beatmapHashes[pos + thread]);
                 }
 
                 std::ranges::transform(workers, std::back_inserter(beatmaps), [](auto& worker){ return worker.get(); });
