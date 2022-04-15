@@ -28,14 +28,13 @@ namespace kaede::api
         Song songInfo;
     };
 
-    auto get_beatmap_info(const std::string_view& playerKey, const std::string_view& beatmapHash) -> Beatmap;
-    
-    auto get_beatmap_info(const std::string_view& playerKey, const std::vector<std::string_view>& beatmapHashes) -> std::vector<Beatmap>;
+    using PlayerKey     = std::string_view;
+    using BeatmapHash   = std::string_view;
+    using BeatmapHashes = std::vector<std::string>;
 
-    auto get_beatmap_info(const std::string_view& playerKey,
-                          const std::vector<std::string>& beatmapHashes, 
-                          const std::size_t threadCount) -> std::vector<Beatmap>;
-
+    auto get_beatmap_info(const PlayerKey& playerKey, const BeatmapHash& beatmapHash) -> Beatmap;
+    auto get_beatmap_info(const PlayerKey& playerKey, const BeatmapHashes& beatmapHashes) -> std::vector<Beatmap>;
+    auto get_beatmap_info(const PlayerKey& playerKey, const BeatmapHashes& beatmapHashes, const std::size_t threadCount) -> std::vector<Beatmap>;
     auto download_beatmap(const std::filesystem::path& path, const Beatmap& beatmap) -> void;
 }
 

@@ -19,17 +19,19 @@ namespace kaede::api
         constexpr const auto GET_BEATMAP_INFO = "https://osu.ppy.sh/api/get_beatmaps?k={}&h={}";
     }
 
-    auto get_beatmap_info(const std::string_view& playerKey, const std::string_view& beatmapHash) -> Beatmap
+    auto get_beatmap_info(const PlayerKey& playerKey, const BeatmapHash& beatmapHash) -> Beatmap
     {
         if (playerKey.empty()) return { };
 
         std::string response { };
-
         core::get(fmt::format(endpoint::GET_BEATMAP_INFO, playerKey, beatmapHash), &response);
-        
+
         const auto beatmapJson = nlohmann::json::parse(response)[0];
 
-        if (beatmapJson.is_null()) { KAEDE_WARN(fmt::format("couldn't retrieve information for {}.", beatmapHash)); return { }; }
+        if (beatmapJson.is_null())
+        {
+            KAEDE_WARN(fmt::format("couldn't retrieve information for {}.", beatmapHash)); return { };
+        }
 
         return Beatmap
         {
@@ -50,7 +52,7 @@ namespace kaede::api
         };
     }
 
-    auto get_beatmap_info(const std::string_view& playerKey, const std::vector<std::string_view>& beatmapHashes) -> std::vector<Beatmap>
+    auto get_beatmap_info(const PlayerKey& playerKey, const BeatmapHashes& beatmapHashes) -> std::vector<Beatmap>
     {
         std::vector<Beatmap> beatmaps { }; beatmaps.reserve(beatmapHashes.size());
 
@@ -64,16 +66,14 @@ namespace kaede::api
         return beatmaps;
     }
 
-    auto get_beatmap_info(const std::string_view& playerKey,
-                          const std::vector<std::string>& beatmapHashes,
-                          const std::size_t threadCount) -> std::vector<Beatmap>
+    auto get_beatmap_info(const PlayerKey& playerKey, const BeatmapHashes& beatmapHashes, const std::size_t threadCount) -> std::vector<Beatmap>
     {
         std::vector<Beatmap> beatmaps { }; beatmaps.reserve(beatmapHashes.size());
 
         const auto processAfter = (beatmapHashes.size() % threadCount);
         const auto processNow   = beatmapHashes.size() - processAfter;
 
-        using ptrGBI = Beatmap(*)(const std::string_view&, const std::string_view&);
+        using GBI = Beatmap(*)(const std::string_view&, const std::string_view&);
 
         const auto processHashes = [&playerKey, &beatmaps](const std::vector<std::string>& beatmapHashes, const std::size_t processCount, const std::size_t threadCount)
         {
@@ -83,12 +83,10 @@ namespace kaede::api
             {
                 for (auto thread = 0; thread < threadCount; ++thread)
                 {
-                    workers[thread] = std::async<ptrGBI>(std::launch::async, get_beatmap_info, playerKey, beatmapHashes[pos + thread]);
+                    workers[thread] = std::async<GBI>(std::launch::async, get_beatmap_info, playerKey, beatmapHashes[pos + thread]);
                 }
 
                 std::ranges::transform(workers, std::back_inserter(beatmaps), [](auto& worker){ return worker.get(); });
-
-                std::this_thread::sleep_for(std::chrono::milliseconds(250));
             }
         };
 
@@ -100,7 +98,7 @@ namespace kaede::api
         return beatmaps;
     }
 
-    auto download_beatmap(const std::filesystem::path path, const Beatmap& beatmap) -> void
+    auto download_beatmap(const std::filesystem::path& path, const Beatmap& beatmap) -> void
     {
         if (!std::filesystem::exists(path))
         {

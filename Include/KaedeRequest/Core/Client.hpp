@@ -16,8 +16,10 @@ namespace kaede::api::core
     template <class UnknownType>
     using WriteFunction = std::size_t (*)(char*, std::size_t, std::size_t, UnknownType*);
 
+    using Url = std::string_view;
+
     template <class UnknownType>
-    auto get(const std::string_view& url, UnknownType* result, const WriteFunction<UnknownType> writeFunction) -> void
+    auto get(const Url& url, UnknownType* result, const WriteFunction<UnknownType> writeFunction) -> void
     {
         curl::curl_easy curl { };
 
@@ -25,8 +27,6 @@ namespace kaede::api::core
         curl.add<CURLOPT_FOLLOWLOCATION>(true);
         curl_easy_setopt(curl.get_curl(), CURLOPT_WRITEDATA, result);
         curl_easy_setopt(curl.get_curl(), CURLOPT_WRITEFUNCTION, writeFunction);
-
-        KAEDE_INFO(fmt::format("Performing HTTP GET request at {}", url.data()));
 
         try
         {
@@ -39,13 +39,13 @@ namespace kaede::api::core
     }
 
     template <class UnknownType>
-    auto get(const std::string_view& url, UnknownType* result) -> void;
+    auto get(const Url& url, UnknownType* result) -> void;
 
     template <>
-    auto get(const std::string_view& url, std::string* result) -> void;
+    auto get(const Url& url, std::string* result) -> void;
     
     template <>
-    auto get(const std::string_view& url, std::ofstream* result) -> void;
+    auto get(const Url& url, std::ofstream* result) -> void;
 }
 
 #endif
