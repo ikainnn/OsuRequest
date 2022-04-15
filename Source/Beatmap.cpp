@@ -29,6 +29,8 @@ namespace kaede::api
         
         const auto beatmapJson = nlohmann::json::parse(response)[0];
 
+        if (beatmapJson.empty()) { KAEDE_WARN(fmt::format("couldn't retrieve information for {}.", beatmapHash)); return { }; }
+
         return Beatmap
         {
             .beatmapsetID = beatmapJson["beatmapset_id"],
@@ -86,7 +88,7 @@ namespace kaede::api
 
                 std::ranges::transform(workers, std::back_inserter(beatmaps), [](auto& worker){ return worker.get(); });
 
-                std::this_thread::sleep_for(std::chrono::milliseconds(250));
+                std::this_thread::sleep_for(std::chrono::milliseconds(1000));
             }
         };
 
