@@ -16,15 +16,15 @@ namespace kaede::api
     namespace endpoint
     {
         constexpr const auto DOWNLOAD_BEATMAP = "https://beatconnect.io/b/{}";
-        constexpr const auto GET_BEATMAP_INFO = "https://osu.ppy.sh/api/get_beatmaps?k={}&h={}";
+        constexpr const auto BEATMAP_INFO = "https://osu.ppy.sh/api/get_beatmaps?k={}&h={}";
     }
 
-    auto get_beatmap_info(const PlayerKey& playerKey, const BeatmapHash& beatmapHash) -> Beatmap
+    auto get_beatmap_info(const PlayerKey& playerKey, const Hash& beatmapHash) -> Beatmap
     {
         if (playerKey.empty()) return { };
 
         std::string response { };
-        core::get(fmt::format(endpoint::GET_BEATMAP_INFO, playerKey, beatmapHash), &response);
+        core::get(fmt::format(endpoint::BEATMAP_INFO, playerKey, beatmapHash), &response);
 
         const auto beatmapJson = nlohmann::json::parse(response)[0];
 
@@ -52,7 +52,7 @@ namespace kaede::api
         };
     }
 
-    auto get_beatmap_info(const PlayerKey& playerKey, const BeatmapHashes& beatmapHashes) -> std::vector<Beatmap>
+    auto get_beatmap_info(const PlayerKey& playerKey, const std::vector<Hash>& beatmapHashes) -> std::vector<Beatmap>
     {
         std::vector<Beatmap> beatmaps { }; beatmaps.reserve(beatmapHashes.size());
 
@@ -66,7 +66,7 @@ namespace kaede::api
         return beatmaps;
     }
 
-    auto get_beatmap_info(const PlayerKey& playerKey, const BeatmapHashes& beatmapHashes, const std::size_t threadCount) -> std::vector<Beatmap>
+    auto get_beatmap_info(const PlayerKey& playerKey, const std::vector<Hash>& beatmapHashes, const std::size_t threadCount) -> std::vector<Beatmap>
     {
         std::vector<Beatmap> beatmaps { }; beatmaps.reserve(beatmapHashes.size());
 
@@ -75,7 +75,7 @@ namespace kaede::api
 
         using GBI = Beatmap(*)(const std::string_view&, const std::string_view&);
 
-        const auto processHashes = [&playerKey, &beatmaps](const std::vector<std::string>& beatmapHashes, const std::size_t processCount, const std::size_t threadCount)
+        const auto processHashes = [&playerKey, &beatmaps](const std::vector<Hash>& beatmapHashes, const std::size_t processCount, const std::size_t threadCount)
         {
             std::vector<std::future<Beatmap>> workers { threadCount };
 
@@ -98,9 +98,9 @@ namespace kaede::api
         return beatmaps;
     }
 
-    auto download_beatmap(const std::filesystem::path& path, const Beatmap& beatmap) -> void
+    auto download_beatmap(const fs::path& path, const Beatmap& beatmap) -> void
     {
-        if (!std::filesystem::exists(path))
+        if (!fs::exists(path))
         {
             KAEDE_ERRO(fmt::format("Couldn't find path {}", path.string())); return;
         }
@@ -117,5 +117,36 @@ namespace kaede::api
         std::ofstream beatmapStream { fmt::format("{}/{}.osz", path.string(), beatmapName), std::ios::binary };
 
         core::get(fmt::format(endpoint::DOWNLOAD_BEATMAP, beatmap.beatmapsetID), &beatmapStream);
+    }
+
+    auto download_beatmap(const fs::path& path, const std::vector<Beatmap>& beatmaps) -> void
+    {
+        for (const auto& beatmap : beatmaps) download_beatmap(path, beatmap);
+    }
+
+    auto download_beatmap(const fs::path& path, const std::vector<Beatmap>& beatmaps, const std::size_t threadCount) -> void
+    {
+        const auto processAfter = (beatmaps.size() % threadCount);
+        const auto processNow   = beatmaps.size() - processAfter;
+
+        using DB = void(*)(const fs::path&, const Beatmap&);
+
+        const auto processBeatmaps = [&path](const std::vector<Beatmap>& beatmaps, const std::size_t processCount, const std::size_t threadCount)
+        {
+            std::vector<std::future<void>> workers { threadCount };
+
+            for (std::size_t pos = 0; pos < processCount; pos += threadCount)
+            {
+                for (auto thread = 0; thread < threadCount; ++thread)
+                {
+                    workers[thread] = std::async<DB>(std::launch::async, download_beatmap, path, beatmaps[pos + thread]);
+                }
+
+                std::ranges::for_each(workers, [](auto& worker){ return worker.get(); });
+            }
+        };
+
+        processBeatmaps(beatmaps, processNow, threadCount);
+        processBeatmaps({ beatmaps.begin() + processNow, beatmaps.end() }, processAfter, processAfter);
     }
 }
