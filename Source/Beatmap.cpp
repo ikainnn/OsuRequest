@@ -85,7 +85,7 @@ namespace kaede::api
                     workers[thread] = std::async<FunctionSignature>(std::launch::async, get_beatmap_info, playerKey, beatmapHashes[pos + thread]);
                 }
 
-                std::ranges::transform(workers, std::back_inserter(beatmaps), [](auto& worker){ return worker.get(); });
+                std::ranges::transform(workers, std::back_inserter(beatmaps), &std::future<Beatmap>::get);
             }
         };
 
@@ -141,7 +141,7 @@ namespace kaede::api
                     workers[thread] = std::async<FunctionSignature>(std::launch::async, download_beatmap, path, beatmaps[pos + thread]);
                 }
 
-                std::ranges::for_each(workers, [](auto& worker){ return worker.get(); });
+                std::ranges::for_each(workers, &std::future<void>::get);
             }
         };
 
