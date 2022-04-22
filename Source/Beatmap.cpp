@@ -72,7 +72,7 @@ namespace kaede::api
         const auto processAfter = (beatmapHashes.size() % threadCount);
         const auto processNow   = beatmapHashes.size() - processAfter;
 
-        using GBI = Beatmap(*)(const std::string_view&, const std::string_view&);
+        using FunctionSignature = Beatmap(*)(const std::string_view&, const std::string_view&);
 
         const auto processHashes = [&playerKey, &beatmaps](const Hashes& beatmapHashes, const std::size_t processCount, const std::size_t threadCount)
         {
@@ -82,7 +82,7 @@ namespace kaede::api
             {
                 for (auto thread = 0; thread < threadCount; ++thread)
                 {
-                    workers[thread] = std::async<GBI>(std::launch::async, get_beatmap_info, playerKey, beatmapHashes[pos + thread]);
+                    workers[thread] = std::async<FunctionSignature>(std::launch::async, get_beatmap_info, playerKey, beatmapHashes[pos + thread]);
                 }
 
                 std::ranges::transform(workers, std::back_inserter(beatmaps), [](auto& worker){ return worker.get(); });
@@ -128,7 +128,7 @@ namespace kaede::api
         const auto processAfter = (beatmaps.size() % threadCount);
         const auto processNow   = beatmaps.size() - processAfter;
 
-        using DB = void(*)(const fs::path&, const Beatmap&);
+        using FunctionSignature = void(*)(const fs::path&, const Beatmap&);
 
         const auto processBeatmaps = [&path](const std::vector<Beatmap>& beatmaps, const std::size_t processCount, const std::size_t threadCount)
         {
@@ -138,7 +138,7 @@ namespace kaede::api
             {
                 for (auto thread = 0; thread < threadCount; ++thread)
                 {
-                    workers[thread] = std::async<DB>(std::launch::async, download_beatmap, path, beatmaps[pos + thread]);
+                    workers[thread] = std::async<FunctionSignature>(std::launch::async, download_beatmap, path, beatmaps[pos + thread]);
                 }
 
                 std::ranges::for_each(workers, [](auto& worker){ return worker.get(); });
