@@ -7,3 +7,6 @@
 [submodule "External/fmt"]
 	path = External/fmt
 	url = https://github.com/fmtlib/fmt/
+[submodule "External/thread_pool"]
+	path = External/thread_pool
+	url = https://github.com/rvaser/thread_pool

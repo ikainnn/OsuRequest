@@ -39,6 +39,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     "External/curlcpp/include"
     "External/spdlog/include"
     "External/json/include"
-    "External/fmt/include")
+    "External/fmt/include"
+    "External/thread_pool/include")
 
 target_link_libraries(${PROJECT_NAME} ${CURL_LIB_DIR} ${CURLCPP_LIB_DIR} ws2_32 crypt32 wldap32 normaliz spdlog fmt)

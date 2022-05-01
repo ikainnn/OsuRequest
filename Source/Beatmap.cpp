@@ -1,14 +1,17 @@
 #include "../Include/KaedeRequest/Beatmap.hpp"
 
-#include <future>
-#include <ranges>
-#include <thread>
+#define EXTERNAL_INCLUDES
+    #include <future>
+    #include <ranges>
+    #include <thread>
 
-#include "fmt/format.h"
-#include "nlohmann/json.hpp"
+    #include "fmt/format.h"
+    #include "nlohmann/json.hpp"
+    #include "thread_pool/thread_pool.hpp"
 
-#include "../Include/Logging.hpp"
-#include "../Include/KaedeRequest/Core/Client.hpp"
+    #include "../Include/Logging.hpp"
+    #include "../Include/KaedeRequest/Core/Client.hpp"
+#define EXTERNAL_INCLUDES
 
 namespace kaede::api
 {
@@ -65,34 +68,20 @@ namespace kaede::api
         return beatmaps;
     }
 
-    auto get_beatmap_info(const PlayerKey& playerKey, const Hashes& beatmapHashes, const std::size_t threadCount) -> std::vector<Beatmap>
+    auto get_beatmap_info(const PlayerKey& playerKey, const Hashes& beatmapHashes, const std::size_t numThread) -> std::vector<Beatmap>
     {
-        std::vector<Beatmap> beatmaps { }; beatmaps.reserve(beatmapHashes.size());
+        thread_pool::ThreadPool pool { numThread };
 
-        const auto processAfter = (beatmapHashes.size() % threadCount);
-        const auto processNow   = beatmapHashes.size() - processAfter;
+        std::vector<std::future<Beatmap>> beatmapFutures{};
+        std::vector<Beatmap> beatmaps{};
 
-        using FunctionSignature = Beatmap(*)(const std::string_view&, const std::string_view&);
-
-        const auto processHashes = [&playerKey, &beatmaps](const Hashes& beatmapHashes, const std::size_t processCount, const std::size_t threadCount)
+        using FunctionType = Beatmap(const PlayerKey&, const Hash&);
+        std::ranges::transform(beatmapHashes, std::back_inserter(beatmapFutures), [&](auto&& beatmapHash)
         {
-            std::vector<std::future<Beatmap>> workers { threadCount };
+            return pool.Submit<FunctionType>(get_beatmap_info, playerKey, beatmapHash);
+        });
 
-            for (std::size_t pos = 0; pos < processCount; pos += threadCount)
-            {
-                for (auto thread = 0; thread < threadCount; ++thread)
-                {
-                    workers[thread] = std::async<FunctionSignature>(std::launch::async, get_beatmap_info, playerKey, beatmapHashes[pos + thread]);
-                }
-
-                std::ranges::transform(workers, std::back_inserter(beatmaps), &std::future<Beatmap>::get);
-            }
-        };
-
-        processHashes(beatmapHashes, processNow, threadCount);
-        processHashes({ beatmapHashes.begin() + processNow, beatmapHashes.end() }, processAfter, processAfter);
-
-        if (playerKey.empty()) KAEDE_WARN("playerKey was empty. request might not have been completed properly.");
+        std::ranges::transform(beatmapFutures, std::back_inserter(beatmaps), &std::future<Beatmap>::get);
 
         return beatmaps;
     }
@@ -123,29 +112,14 @@ namespace kaede::api
         for (const auto& beatmap : beatmaps) download_beatmap(path, beatmap);
     }
 
-    auto download_beatmap(const fs::path& path, const std::vector<Beatmap>& beatmaps, const std::size_t threadCount) -> void
+    auto download_beatmap(const fs::path& path, const std::vector<Beatmap>& beatmaps, const std::size_t numThread) -> void
     {
-        const auto processAfter = (beatmaps.size() % threadCount);
-        const auto processNow   = beatmaps.size() - processAfter;
+        thread_pool::ThreadPool pool { numThread };
 
-        using FunctionSignature = void(*)(const fs::path&, const Beatmap&);
-
-        const auto processBeatmaps = [&path](const std::vector<Beatmap>& beatmaps, const std::size_t processCount, const std::size_t threadCount)
+        using FunctionType = void(const fs::path&, const Beatmap&);
+        std::ranges::for_each(beatmaps, [&] (auto&& beatmap)
         {
-            std::vector<std::future<void>> workers { threadCount };
-
-            for (std::size_t pos = 0; pos < processCount; pos += threadCount)
-            {
-                for (auto thread = 0; thread < threadCount; ++thread)
-                {
-                    workers[thread] = std::async<FunctionSignature>(std::launch::async, download_beatmap, path, beatmaps[pos + thread]);
-                }
-
-                std::ranges::for_each(workers, &std::future<void>::get);
-            }
-        };
-
-        processBeatmaps(beatmaps, processNow, threadCount);
-        processBeatmaps({ beatmaps.begin() + processNow, beatmaps.end() }, processAfter, processAfter);
+            pool.Submit<FunctionType>(download_beatmap, path, beatmap); 
+        });
     }
 }
