@@ -95,7 +95,7 @@ namespace kaede::api
 
         auto beatmapName = fmt::format("{} {} - {}", beatmap.beatmapsetID, beatmap.songInfo.artist, beatmap.songInfo.title);
 
-        std::replace_if(beatmapName.begin(), beatmapName.end(), [](auto value)
+        std::ranges::replace_if(beatmapName, [](auto&& value)
         {
             return value == '\\' || value == '\"' || value == '/' ||
                    value == '*'  || value == '?'  || value == '|' ||
