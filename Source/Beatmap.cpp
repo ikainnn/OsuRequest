@@ -7,7 +7,7 @@
 
     #include "fmt/format.h"
     #include "nlohmann/json.hpp"
-    #include "thread_pool/thread_pool.hpp"
+    #include "ThreadPool/thread_pool.hpp"
 
     #include "../Include/Logging.hpp"
     #include "../Include/KaedeRequest/Core/Client.hpp"
