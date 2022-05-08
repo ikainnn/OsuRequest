@@ -1,12 +1,9 @@
-[submodule "External/spdlog"]
-	path = External/spdlog
-	url = https://github.com/gabime/spdlog
 [submodule "External/json"]
 	path = External/json
 	url = https://github.com/nlohmann/json
 [submodule "External/fmt"]
 	path = External/fmt
 	url = https://github.com/fmtlib/fmt/
-[submodule "External/ThreadPool"]
-	path = External/ThreadPool
+[submodule "External/thread_pool"]
+	path = External/thread_pool
 	url = https://github.com/ikainnn/thread_pool

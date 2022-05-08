@@ -1,17 +1,15 @@
 #include "../Include/KaedeRequest/Beatmap.hpp"
 
-#define EXTERNAL_INCLUDES
-    #include <future>
-    #include <ranges>
-    #include <thread>
+#include <future>
+#include <ranges>
+#include <thread>
 
-    #include "fmt/format.h"
-    #include "nlohmann/json.hpp"
-    #include "ThreadPool/thread_pool.hpp"
+#include "fmt/format.h"
+#include "nlohmann/json.hpp"
+#include "thread_pool/thread_pool.hpp"
 
-    #include "../Include/Logging.hpp"
-    #include "../Include/KaedeRequest/Core/Client.hpp"
-#define EXTERNAL_INCLUDES
+#include "../Include/Logging.hpp"
+#include "../Include/KaedeRequest/Core/Client.hpp"
 
 namespace kaede::api
 {
@@ -21,7 +19,7 @@ namespace kaede::api
         constexpr const auto BEATMAP_INFO = "https://osu.ppy.sh/api/get_beatmaps?k={}&h={}";
     }
 
-    auto get_beatmap_info(const PlayerKey& playerKey, const Hash& beatmapHash) -> Beatmap
+    auto get_beatmap_info(const Key& playerKey, const Hash& beatmapHash) -> Beatmap
     {
         if (playerKey.empty()) return { };
 
@@ -54,7 +52,7 @@ namespace kaede::api
         };
     }
 
-    auto get_beatmap_info(const PlayerKey& playerKey, const Hashes& beatmapHashes) -> std::vector<Beatmap>
+    auto get_beatmap_info(const Key& playerKey, const Hashes& beatmapHashes) -> std::vector<Beatmap>
     {
         std::vector<Beatmap> beatmaps { }; beatmaps.reserve(beatmapHashes.size());
 
@@ -68,14 +66,14 @@ namespace kaede::api
         return beatmaps;
     }
 
-    auto get_beatmap_info(const PlayerKey& playerKey, const Hashes& beatmapHashes, const std::size_t numThread) -> std::vector<Beatmap>
+    auto get_beatmap_info(const Key& playerKey, const Hashes& beatmapHashes, const std::size_t numThread) -> std::vector<Beatmap>
     {
         thread_pool::ThreadPool pool { numThread };
 
         std::vector<std::future<Beatmap>> beatmapFutures{};
         std::vector<Beatmap> beatmaps{};
 
-        using FunctionType = Beatmap(const PlayerKey&, const Hash&);
+        using FunctionType = Beatmap(const Key&, const Hash&);
         std::ranges::transform(beatmapHashes, std::back_inserter(beatmapFutures), [&](auto&& beatmapHash)
         {
             return pool.Submit<FunctionType>(get_beatmap_info, playerKey, beatmapHash);
@@ -86,9 +84,9 @@ namespace kaede::api
         return beatmaps;
     }
 
-    auto download_beatmap(const fs::path& path, const Beatmap& beatmap) -> void
+    auto download_beatmap(const filesystem::path& path, const Beatmap& beatmap) -> void
     {
-        if (!fs::exists(path))
+        if (!filesystem::exists(path))
         {
             KAEDE_ERRO(fmt::format("Couldn't find path {}", path.string())); return;
         }
@@ -107,16 +105,16 @@ namespace kaede::api
         core::get(fmt::format(endpoint::DOWNLOAD_BEATMAP, beatmap.beatmapsetID), &beatmapStream);
     }
 
-    auto download_beatmap(const fs::path& path, const std::vector<Beatmap>& beatmaps) -> void
+    auto download_beatmap(const filesystem::path& path, const std::vector<Beatmap>& beatmaps) -> void
     {
         for (const auto& beatmap : beatmaps) download_beatmap(path, beatmap);
     }
 
-    auto download_beatmap(const fs::path& path, const std::vector<Beatmap>& beatmaps, const std::size_t numThread) -> void
+    auto download_beatmap(const filesystem::path& path, const std::vector<Beatmap>& beatmaps, const std::size_t numThread) -> void
     {
         thread_pool::ThreadPool pool { numThread };
 
-        using FunctionType = void(const fs::path&, const Beatmap&);
+        using FunctionType = void(const filesystem::path&, const Beatmap&);
         std::ranges::for_each(beatmaps, [&] (auto&& beatmap)
         {
             pool.Submit<FunctionType>(download_beatmap, path, beatmap); 

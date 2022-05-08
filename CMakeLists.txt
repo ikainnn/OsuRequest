@@ -27,7 +27,6 @@ macro(add_subdirectory_safe var)
     endif()
 endmacro()
 
-add_subdirectory_safe("spdlog")
 add_subdirectory_safe("fmt")
 
 set(SOURCE_FILES "${BASE}/Core/Client.cpp" "${BASE}/Beatmap.cpp")
@@ -37,9 +36,8 @@ add_library(${PROJECT_NAME} STATIC ${SOURCE_FILES})
 target_include_directories(${PROJECT_NAME} PUBLIC
     "External/curl/include"
     "External/curlcpp/include"
-    "External/spdlog/include"
     "External/json/include"
     "External/fmt/include"
-    "External/ThreadPool/include")
+    "External/thread_pool/include")
 
-target_link_libraries(${PROJECT_NAME} ${CURL_LIB_DIR} ${CURLCPP_LIB_DIR} ws2_32 crypt32 wldap32 normaliz spdlog fmt)
+target_link_libraries(${PROJECT_NAME} ${CURL_LIB_DIR} ${CURLCPP_LIB_DIR} ws2_32 crypt32 wldap32 normaliz fmt)

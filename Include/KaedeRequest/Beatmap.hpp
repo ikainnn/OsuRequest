@@ -28,18 +28,18 @@ namespace kaede::api
         Song songInfo;
     };
 
-    using PlayerKey = std::string_view;
-    using Hash      = std::string_view;
-    using Hashes    = std::vector<std::string>;
+    using Key    = std::string_view;
+    using Hash   = std::string_view;
+    using Hashes = std::vector<std::string>;
 
-    namespace fs = std::filesystem;
+    namespace filesystem = std::filesystem;
 
-    auto get_beatmap_info(const PlayerKey& playerKey, const Hash& beatmapHash) -> Beatmap;
-    auto get_beatmap_info(const PlayerKey& playerKey, const Hashes& beatmapHashes) -> std::vector<Beatmap>;
-    auto get_beatmap_info(const PlayerKey& playerKey, const Hashes& beatmapHashes, const std::size_t threadCount) -> std::vector<Beatmap>;
-    auto download_beatmap(const fs::path& path, const Beatmap& beatmap) -> void;
-    auto download_beatmap(const fs::path& path, const std::vector<Beatmap>& beatmaps) -> void;
-    auto download_beatmap(const fs::path& path, const std::vector<Beatmap>& beatmaps, const std::size_t threadCount) -> void;
+    auto get_beatmap_info(const Key& playerKey, const Hash& beatmapHash) -> Beatmap;
+    auto get_beatmap_info(const Key& playerKey, const Hashes& beatmapHashes) -> std::vector<Beatmap>;
+    auto get_beatmap_info(const Key& playerKey, const Hashes& beatmapHashes, const std::size_t threadCount) -> std::vector<Beatmap>;
+    auto download_beatmap(const filesystem::path& path, const Beatmap& beatmap) -> void;
+    auto download_beatmap(const filesystem::path& path, const std::vector<Beatmap>& beatmaps) -> void;
+    auto download_beatmap(const filesystem::path& path, const std::vector<Beatmap>& beatmaps, const std::size_t threadCount) -> void;
 }
 
 #endif

@@ -7,7 +7,6 @@
 #include <fstream>
 
 #include "curlcpp/curl_easy.h"
-#include "fmt/format.h"
 
 #include "../../Logging.hpp"
 
