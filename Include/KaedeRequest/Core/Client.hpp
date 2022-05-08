@@ -7,6 +7,7 @@
 #include <fstream>
 
 #include "curlcpp/curl_easy.h"
+#include "fmt/format.h"
 
 #include "../../Logging.hpp"
 
@@ -37,13 +38,7 @@ namespace kaede::api::core
         }
     }
 
-    template <class UnknownType>
-    auto get(const Url& url, UnknownType* result) -> void;
-
-    template <>
     auto get(const Url& url, std::string* result) -> void;
-    
-    template <>
     auto get(const Url& url, std::ofstream* result) -> void;
 }
 
