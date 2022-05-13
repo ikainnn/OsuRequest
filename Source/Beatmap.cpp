@@ -101,7 +101,6 @@ namespace kaede::api
         }, '_');
 
         std::ofstream beatmapStream { fmt::format("{}/{}.osz", path.string(), beatmapName), std::ios::binary };
-
         core::get(fmt::format(endpoint::DOWNLOAD_BEATMAP, beatmap.beatmapsetID), &beatmapStream);
     }
 
