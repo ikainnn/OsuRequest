@@ -33,7 +33,7 @@ namespace kaede::api::core
         }
         catch (const std::exception& exception)
         {
-            KAEDE_ERRO("{}", exception.what());
+            KAEDE_ERRO(exception.what());
         }
     }
 

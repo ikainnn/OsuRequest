@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.2)
 
 project(KaedeRequest)
 
-set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD 20)
 
 add_definitions(-DUNICODE -D_UNICODE -DCURL_STATICLIB)
 
@@ -23,10 +23,8 @@ set(SOURCE_FILES "${BASE}/Core/Client.cpp" "${BASE}/Beatmap.cpp")
 
 add_library(${PROJECT_NAME} STATIC ${SOURCE_FILES})
 
-target_include_directories(${PROJECT_NAME} PUBLIC
-    "External/curl/include"
-    "External/curlcpp/include"
-    "External/json/include"
-    "External/thread_pool/include")
+target_include_directories(${PROJECT_NAME} PUBLIC "External/curl/include" "External/curlcpp/include"
+                                                  "External/json/include" "External/fmt/include"
+                                                  "External/thread_pool/include")
 
-target_link_libraries(${PROJECT_NAME} ${CURL_LIB_DIR} ${CURLCPP_LIB_DIR} ws2_32 crypt32 wldap32 normaliz)
+target_link_libraries(${PROJECT_NAME} ${CURL_LIB_DIR} ${CURLCPP_LIB_DIR} ws2_32 crypt32 wldap32 normaliz fmt)
