@@ -72,7 +72,7 @@ namespace kaede::api
         std::vector<std::future<Beatmap>> beatmapFutures{};
         std::vector<Beatmap> beatmaps{};
 
-        using FunctionType = Beatmap(const Key&, const Hash&);
+        using FunctionType = Beatmap(*)(const Key&, const Hash&);
         std::ranges::transform(beatmapHashes, std::back_inserter(beatmapFutures), [&](auto&& beatmapHash)
         {
             return pool.Submit<FunctionType>(get_beatmap_info, playerKey, beatmapHash);
@@ -112,7 +112,7 @@ namespace kaede::api
     {
         thread_pool::ThreadPool pool { numThread };
 
-        using FunctionType = void(const filesystem::path&, const Beatmap&);
+        using FunctionType = void(*)(const filesystem::path&, const Beatmap&);
         std::ranges::for_each(beatmaps, [&] (auto&& beatmap)
         {
             pool.Submit<FunctionType>(download_beatmap, path, beatmap); 

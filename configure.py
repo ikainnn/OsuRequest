@@ -15,6 +15,7 @@ def parse_command_arguments(arguments):
 
 def main(arguments):
     arguments.pop(0) # ignores the first argument (aka executable name)
+
     extraArguments = parse_command_arguments(arguments)
     configurationCommand = format("cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=true {} -G \"Ninja\" -S . -B Build/", extraArguments)
 
