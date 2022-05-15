@@ -4,7 +4,7 @@ project(KaedeRequest)
 
 set(CMAKE_CXX_STANDARD 23)
 
-add_definitions(-DUNICODE -D_UNICODE -DKAEDE_DEBUG -DCURL_STATICLIB)
+add_definitions(-DUNICODE -D_UNICODE -DCURL_STATICLIB)
 
 set(BASE "Source/")
 
