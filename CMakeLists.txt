@@ -4,7 +4,7 @@ project(KaedeRequest)
 
 set(CMAKE_CXX_STANDARD 23)
 
-add_definitions(-DUNICODE -D_UNICODE -DCURL_STATICLIB)
+add_definitions(-DUNICODE -D_UNICODE -DKAEDE_DEBUG -DCURL_STATICLIB)
 
 set(BASE "Source/")
 
@@ -19,16 +19,6 @@ else()
     set(CURLCPP_LIB_DIR "${CURLCPP_LIB_DIR}/curlcpp.lib")
 endif()
 
-macro(add_subdirectory_safe var)
-    if (NOT TARGET ${var})
-        add_subdirectory("External/${var}")
-    else()
-        message(STATUS "${var} is already added. nothing changed.")
-    endif()
-endmacro()
-
-add_subdirectory_safe("fmt")
-
 set(SOURCE_FILES "${BASE}/Core/Client.cpp" "${BASE}/Beatmap.cpp")
 
 add_library(${PROJECT_NAME} STATIC ${SOURCE_FILES})
@@ -37,7 +27,6 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     "External/curl/include"
     "External/curlcpp/include"
     "External/json/include"
-    "External/fmt/include"
     "External/thread_pool/include")
 
-target_link_libraries(${PROJECT_NAME} ${CURL_LIB_DIR} ${CURLCPP_LIB_DIR} ws2_32 crypt32 wldap32 normaliz fmt)
+target_link_libraries(${PROJECT_NAME} ${CURL_LIB_DIR} ${CURLCPP_LIB_DIR} ws2_32 crypt32 wldap32 normaliz)

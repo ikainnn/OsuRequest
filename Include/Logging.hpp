@@ -5,15 +5,15 @@
 #include <format>
 
 #ifdef KAEDE_DEBUG
-    #define BASIC_LOG(tag, msg) std::cout << std::format("{} {} \n", tag, msg)
+    #define KAEDE_PRINT(fmt, ...) std::cout << std::format(fmt, __VA_ARGS__) << '\n'
 
-    #define KAEDE_WARN(msg) BASIC_LOG("[WARN]", msg)
-    #define KAEDE_ERRO(msg) BASIC_LOG("[ERRO]", msg)
-    #define KAEDE_INFO(msg) BASIC_LOG("[INFO]", msg)
+    #define KAEDE_WARN(msg, ...) KAEDE_PRINT("[WARN] {}", msg, __VA_ARGS__)
+    #define KAEDE_ERRO(msg, ...) KAEDE_PRINT("[ERRO] {}", msg, __VA_ARGS__)
+    #define KAEDE_INFO(msg, ...) KAEDE_PRINT("[INFO] {}", msg, __VA_ARGS__)
 #else
-    #define KAEDE_WARN(msg)
-    #define KAEDE_ERRO(msg)
-    #define KAEDE_INFO(msg)
+    #define KAEDE_WARN(msg, ...)
+    #define KAEDE_ERRO(msg, ...)
+    #define KAEDE_INFO(msg, ...)
 #endif
 
 #endif

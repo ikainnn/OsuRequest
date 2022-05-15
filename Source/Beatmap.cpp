@@ -4,7 +4,6 @@
 #include <ranges>
 #include <thread>
 
-#include "fmt/format.h"
 #include "nlohmann/json.hpp"
 #include "thread_pool/thread_pool.hpp"
 
@@ -24,13 +23,13 @@ namespace kaede::api
         if (playerKey.empty()) return { };
 
         std::string response { };
-        core::get(fmt::format(endpoint::BEATMAP_INFO, playerKey, beatmapHash), &response);
+        core::get(std::format(endpoint::BEATMAP_INFO, playerKey, beatmapHash), &response);
 
         const auto beatmapJson = nlohmann::json::parse(response)[0];
 
         if (beatmapJson.is_null())
         {
-            KAEDE_WARN(fmt::format("couldn't retrieve information for {}.", beatmapHash)); return { };
+            KAEDE_WARN("couldn't retrieve information for {}.", beatmapHash); return { };
         }
 
         return Beatmap
@@ -88,10 +87,10 @@ namespace kaede::api
     {
         if (!filesystem::exists(path))
         {
-            KAEDE_ERRO(fmt::format("Couldn't find path {}", path.string())); return;
+            KAEDE_ERRO("Couldn't find path {}", path.string()); return;
         }
 
-        auto beatmapName = fmt::format("{} {} - {}", beatmap.beatmapsetID, beatmap.songInfo.artist, beatmap.songInfo.title);
+        auto beatmapName = std::format("{} {} - {}", beatmap.beatmapsetID, beatmap.songInfo.artist, beatmap.songInfo.title);
 
         std::ranges::replace_if(beatmapName, [](auto&& value)
         {
@@ -100,8 +99,8 @@ namespace kaede::api
                    value == '<'  || value == '>'  || value == ':';
         }, '_');
 
-        std::ofstream beatmapStream { fmt::format("{}/{}.osz", path.string(), beatmapName), std::ios::binary };
-        core::get(fmt::format(endpoint::DOWNLOAD_BEATMAP, beatmap.beatmapsetID), &beatmapStream);
+        std::ofstream beatmapStream { std::format("{}/{}.osz", path.string(), beatmapName), std::ios::binary };
+        core::get(std::format(endpoint::DOWNLOAD_BEATMAP, beatmap.beatmapsetID), &beatmapStream);
     }
 
     auto download_beatmap(const filesystem::path& path, const std::vector<Beatmap>& beatmaps) -> void
