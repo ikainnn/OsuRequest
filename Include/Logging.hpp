@@ -10,10 +10,6 @@
 
 #include "fmt/format.h"
 
-#define KAEDE_ERRO
-#define KAEDE_WARN
-#define KAEDE_INFO
-
 namespace osu_request::logging
 {
     void print(std::string_view _tag, std::string_view _format, auto&&... _args)
