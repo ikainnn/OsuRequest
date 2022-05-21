@@ -12,7 +12,7 @@ endif()
 
 macro(add_subdirectory_safe var)
     if (NOT TARGET ${var})
-        add_subdirectory("External/${var}")
+        add_subdirectory("./External/${var}")
     else()
         message(STATUS "${var} is already added. nothing changed.")
     endif()
@@ -23,10 +23,10 @@ add_subdirectory_safe("curlcpp")
 
 set(SOURCE_FILES "Source/Beatmap.cpp" "Source/Core/Client.cpp")
 set(HEADER_FILES 
-    "External/fmt/include" 
-    "External/json/include" 
-    "External/thread_pool/include" 
-    "External/curlcpp/include")
+    "./External/fmt/include" 
+    "./External/json/include" 
+    "./External/thread_pool/include" 
+    "./External/curlcpp/include")
 
 add_library(${PROJECT_NAME} STATIC ${SOURCE_FILES})
 target_link_libraries(${PROJECT_NAME} PRIVATE fmt curl ${CURL_LIBRARIES})
