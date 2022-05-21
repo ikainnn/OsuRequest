@@ -31,5 +31,6 @@ CTestTestfile.cmake
 _deps
 
 build/
-.vscode/
 cache/
+.vscode/
+.cache/
