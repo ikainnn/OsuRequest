@@ -12,7 +12,7 @@ endif()
 
 macro(add_subdirectory_safe var)
     if (NOT TARGET ${var})
-        add_subdirectory("${PROJECT_SOURCE_DIR}/External/${var}")
+        add_subdirectory("External/${var}")
     else()
         message(STATUS "${var} is already added. nothing changed.")
     endif()
@@ -21,13 +21,11 @@ endmacro()
 add_subdirectory_safe("fmt")
 add_subdirectory_safe("curlcpp")
 
-set(SOURCE_FILES "${PROJECT_SOURCE_DIR}/Source/Beatmap.cpp" "${PROJECT_SOURCE_DIR}/Source/Core/Client.cpp")
+set(SOURCE_FILES "Source/Beatmap.cpp" "Source/Core/Client.cpp")
 set(HEADER_FILES 
-    "${PROJECT_SOURCE_DIR}/External/fmt/include" 
-    "${PROJECT_SOURCE_DIR}/External/json/include" 
-    "${PROJECT_SOURCE_DIR}/External/thread_pool/include" 
-    "${PROJECT_SOURCE_DIR}/External/curlcpp/include")
+    "External/fmt/include" "External/json/include" 
+    "External/thread_pool/include" "External/curlcpp/include")
 
 add_library(${PROJECT_NAME} STATIC ${SOURCE_FILES})
-target_link_libraries(${PROJECT_NAME} PRIVATE fmt curl ${CURL_LIBRARIES})
 target_include_directories(${PROJECT_NAME} PRIVATE ${CURL_INCLUDE_DIR} ${HEADER_FILES})
+target_link_libraries(${PROJECT_NAME} PRIVATE fmt curl pthread ${CURL_LIBRARIES})
