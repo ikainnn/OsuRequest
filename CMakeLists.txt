@@ -11,9 +11,12 @@ if (NOT CURL_FOUND)
 endif()
 
 set(SOURCE_FILES "Source/Beatmap.cpp" "Source/Core/Client.cpp")
+set(HEADER_FILES 
+    "External/fmt/include" 
+    "External/json/include" 
+    "External/thread_pool/include" 
+    "External/curlcpp/include")
 
 add_library(${PROJECT_NAME} ${SOURCE_FILES})
 target_link_libraries(${PROJECT_NAME} PRIVATE ${CURL_LIBRARIES})
-target_include_directories(${PROJECT_NAME} PRIVATE ${CURL_INCLUDE_DIR} 
-    "External/fmt/include" "External/json/include" 
-    "External/thread_pool/include" "External/curlcpp/include")
+target_include_directories(${PROJECT_NAME} PRIVATE ${CURL_INCLUDE_DIR} ${HEADER_FILES})
