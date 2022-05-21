@@ -32,7 +32,7 @@ namespace osu_request::api::core
         }
         catch (const std::exception& exception)
         {
-            KAEDE_ERRO(exception.what());
+            osu_request::logging::error(exception.what());
         }
     }
 
