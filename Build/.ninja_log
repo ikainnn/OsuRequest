@@ -1,0 +1,7 @@
+# ninja log v5
+2	1123	1653170734875919992	CMakeFiles/OsuRequest.dir/Source/Core/Client.cpp.o	21389a3c937a0b5f
+1	4329	1653170738075969811	CMakeFiles/OsuRequest.dir/Source/Beatmap.cpp.o	b1d1cd419ffb425e
+4329	4431	1653170738179971429	libOsuRequest.a	90fd88edef4b68bd
+0	67	1653171692042809987	build.ninja	d00bddd8e6461630
+1	4483	1653171696526876537	CMakeFiles/OsuRequest.dir/Source/Beatmap.cpp.o	b1d1cd419ffb425e
+4483	4588	1653171696634878140	libOsuRequest.a	90fd88edef4b68bd

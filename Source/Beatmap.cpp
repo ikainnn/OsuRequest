@@ -1,4 +1,4 @@
-#include "../Include/KaedeRequest/Beatmap.hpp"
+#include "../Include/OsuRequest/Beatmap.hpp"
 
 #include <future>
 #include <thread>
@@ -7,28 +7,25 @@
 #include "thread_pool/thread_pool.hpp"
 
 #include "../Include/Logging.hpp"
-#include "../Include/KaedeRequest/Core/Client.hpp"
+#include "../Include/OsuRequest/Core/Client.hpp"
 
-namespace kaede::api
+namespace osu_request::api
 {
-    namespace endpoint
-    {
-        constexpr const auto DOWNLOAD_BEATMAP = "https://beatconnect.io/b/{}";
-        constexpr const auto BEATMAP_INFO = "https://osu.ppy.sh/api/get_beatmaps?k={}&h={}";
-    }
+    constexpr const auto DOWNLOAD_BEATMAP = "https://beatconnect.io/b/{}";
+    constexpr const auto BEATMAP_INFO = "https://osu.ppy.sh/api/get_beatmaps?k={}&h={}";
 
-    auto get_beatmap_info(std::string_view playerKey, std::string_view beatmapHash) -> Beatmap
+    auto get_beatmap_info(std::string_view _playerKey, std::string_view _beatmapHash) -> Beatmap
     {
-        if (playerKey.empty()) return { };
+        if (_playerKey.empty()) return { };
 
         std::string response { };
-        core::get(fmt::format(endpoint::BEATMAP_INFO, playerKey, beatmapHash), &response);
+        core::get(fmt::format(BEATMAP_INFO, _playerKey, _beatmapHash), &response);
 
         const auto beatmapJson = nlohmann::json::parse(response)[0];
 
         if (beatmapJson.is_null())
         {
-            KAEDE_WARN("couldn't retrieve information for {}.", beatmapHash); return { };
+            osu_request::logging::warn("couldn't retrieve information for {}.", _beatmapHash); return { };
         }
 
         return Beatmap
@@ -50,31 +47,31 @@ namespace kaede::api
         };
     }
 
-    auto get_beatmap_info(std::string_view playerKey, const Hashes& beatmapHashes) -> std::vector<Beatmap>
+    auto get_beatmap_info(std::string_view _playerKey, const Hashes& _beatmapHashes) -> std::vector<Beatmap>
     {
-        std::vector<Beatmap> beatmaps { }; beatmaps.reserve(beatmapHashes.size());
+        std::vector<Beatmap> beatmaps { }; beatmaps.reserve(_beatmapHashes.size());
 
-        std::transform(beatmapHashes.begin(), beatmapHashes.end(), std::back_inserter(beatmaps), [playerKey] (auto hash) -> Beatmap
+        std::ranges::transform(_beatmapHashes, std::back_inserter(beatmaps), [_playerKey] (auto hash) -> Beatmap
         {
-            return get_beatmap_info(playerKey, hash);
+            return get_beatmap_info(_playerKey, hash);
         });
 
-        if (playerKey.empty()) KAEDE_WARN("Key was empty. request might not have been completed properly.");
+        if (_playerKey.empty()) osu_request::logging::warn("Key was empty. request might not have been completed properly.");
 
         return beatmaps;
     }
 
-    auto get_beatmap_info(std::string_view playerKey, const Hashes& beatmapHashes, std::size_t numThread) -> std::vector<Beatmap>
+    auto get_beatmap_info(std::string_view _playerKey, const Hashes& _beatmapHashes, std::size_t _numThread) -> std::vector<Beatmap>
     {
-        thread_pool::ThreadPool pool { numThread };
+        thread_pool::ThreadPool pool { _numThread };
 
         std::vector<std::future<Beatmap>> beatmapFutures{};
         std::vector<Beatmap> beatmaps{};
 
         using FunctionType = Beatmap(*)(std::string_view, std::string_view);
-        std::transform(beatmapHashes.begin(), beatmapHashes.end(), std::back_inserter(beatmapFutures), [&](auto&& beatmapHash)
+        std::ranges::transform(_beatmapHashes, std::back_inserter(beatmapFutures), [&](auto&& beatmapHash)
         {
-            return pool.Submit<FunctionType>(get_beatmap_info, playerKey, beatmapHash);
+            return pool.Submit<FunctionType>(get_beatmap_info, _playerKey, beatmapHash);
         });
 
         std::transform(beatmapFutures.begin(), beatmapFutures.end(), std::back_inserter(beatmaps), [](auto&& future){ return future.get(); });
@@ -82,39 +79,38 @@ namespace kaede::api
         return beatmaps;
     }
 
-    auto download_beatmap(const filesystem::path& path, const Beatmap& beatmap) -> void
+    auto download_beatmap(const std::filesystem::path& _path, const Beatmap& _beatmap) -> void
     {
-        if (!filesystem::exists(path))
+        if (!std::filesystem::exists(_path))
         {
-            KAEDE_ERRO("Couldn't find path {}", path.string()); return;
+            osu_request::logging::error("Couldn't find path {}", _path.string()); return;
         }
 
-        auto beatmapName = fmt::format("{} {} - {}", beatmap.beatmapsetID, beatmap.songInfo.artist, beatmap.songInfo.title);
-
-        std::replace_if(beatmapName.begin(), beatmapName.end(), [](auto&& value)
+        auto beatmapName = fmt::format("{} {} - {}", _beatmap.beatmapsetID, _beatmap.songInfo.artist, _beatmap.songInfo.title);
+        std::ranges::replace_if(beatmapName, [](auto&& value)
         {
             return value == '\\' || value == '\"' || value == '/' ||
                    value == '*'  || value == '?'  || value == '|' ||
                    value == '<'  || value == '>'  || value == ':';
         }, '_');
 
-        std::ofstream beatmapStream { fmt::format("{}/{}.osz", path.string(), beatmapName), std::ios::binary };
-        core::get(fmt::format(endpoint::DOWNLOAD_BEATMAP, beatmap.beatmapsetID), &beatmapStream);
+        std::ofstream beatmapStream { fmt::format("{}/{}.osz", _path.string(), beatmapName), std::ios::binary };
+        core::get(fmt::format(DOWNLOAD_BEATMAP, _beatmap.beatmapsetID), &beatmapStream);
     }
 
-    auto download_beatmap(const filesystem::path& path, const std::vector<Beatmap>& beatmaps) -> void
+    auto download_beatmap(const std::filesystem::path& _path, const std::vector<Beatmap>& _beatmaps) -> void
     {
-        for (const auto& beatmap : beatmaps) download_beatmap(path, beatmap);
+        for (const auto& beatmap : _beatmaps) download_beatmap(_path, beatmap);
     }
 
-    auto download_beatmap(const filesystem::path& path, const std::vector<Beatmap>& beatmaps, std::size_t numThread) -> void
+    auto download_beatmap(const std::filesystem::path& _path, const std::vector<Beatmap>& _beatmaps, std::size_t _numThread) -> void
     {
-        thread_pool::ThreadPool pool { numThread };
+        thread_pool::ThreadPool pool { _numThread };
 
-        using FunctionType = void(*)(const filesystem::path&, const Beatmap&);
-        std::for_each(beatmaps.begin(), beatmaps.end(), [&] (auto&& beatmap)
+        using FunctionType = void(*)(const std::filesystem::path&, const Beatmap&);
+        std::ranges::for_each(_beatmaps, [&] (auto&& beatmap)
         {
-            pool.Submit<FunctionType>(download_beatmap, path, beatmap); 
+            pool.Submit<FunctionType>(download_beatmap, _path, beatmap); 
         });
     }
 }

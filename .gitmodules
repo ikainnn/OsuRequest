@@ -1,9 +1,12 @@
 [submodule "External/thread_pool"]
 	path = External/thread_pool
-	url = https://github.com/ikainnn/thread_pool
-[submodule "External/json"]
-	path = External/json
-	url = https://github.com/nlohmann/json
+	url = https://github.com/rvaser/thread_pool
 [submodule "External/fmt"]
 	path = External/fmt
 	url = https://github.com/fmtlib/fmt
+[submodule "External/json"]
+	path = External/json
+	url = https://github.com/nlohmann/json/
+[submodule "External/curlcpp"]
+	path = External/curlcpp
+	url = https://github.com/JosephP91/curlcpp
