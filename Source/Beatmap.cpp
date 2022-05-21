@@ -74,7 +74,7 @@ namespace osu_request::api
             return pool.Submit<FunctionType>(get_beatmap_info, _playerKey, beatmapHash);
         });
 
-        std::transform(beatmapFutures.begin(), beatmapFutures.end(), std::back_inserter(beatmaps), [](auto&& future){ return future.get(); });
+        std::ranges::transform(beatmapFutures, std::back_inserter(beatmaps), &std::future<Beatmap>::get);
 
         return beatmaps;
     }
