@@ -3,11 +3,14 @@ cmake_minimum_required(VERSION 3.2)
 project(OsuRequest)
 set(CMAKE_CXX_STANDARD 20)
 
-add_definitions(-DUNICODE -D_UNICODE -DCURL_STATICLIB)
-
 find_package(CURL REQUIRED)
 if (NOT CURL_FOUND)
     message(FATAL_ERROR "Couldn't find CURL")
+endif()
+
+add_definitions(-DUNICODE -D_UNICODE -DCURL_STATICLIB)
+if (CMAKE_BUILD_TYPE STREQUAL "DEBUG")
+    add_definitions(-DDEBUG_BUILD)
 endif()
 
 macro(add_subdirectory_safe var)
