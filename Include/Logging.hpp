@@ -17,7 +17,7 @@ namespace osu_request::logging
     #if OSU_MAN_DEBUG_BUILD
         const auto clock       = std::chrono::system_clock::now();
         const auto currentTime = std::chrono::duration_cast<std::chrono::milliseconds>(clock.time_since_epoch()).count();
-        fmt::print("{} {} {}", tag, currentTime, fmt::format(format, args...));
+        fmt::print("{} {} {}", _tag, currentTime, fmt::format(fmt::runtime(_format), _args...));
     #else
         // FIXME: write these logs to a file.
     #endif
